@@ -9,7 +9,7 @@ const createReview = async (req, res) => {
     if (Object.keys(requestBody).length === 0) {
       return res
         .status(400)
-        .json({
+        .send({
           status: false,
           msg: `Invalid Request. Please input data in the body`,
         });
@@ -18,44 +18,45 @@ const createReview = async (req, res) => {
     let { bookId: _id } = req.params;
 
     if (!validator.isValidObjectId(_id)) {
-      return res.status(400).json({ status: false, msg: `Invalid ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid ID!` });
     }
     const checkID = await bookModel.findById(_id);
 
     if (!checkID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${_id} is not present in DB!` });
+        .send({ status: false, msg: `${_id} is not present in DB!` });
     }
     const idAlreadyDeleted = await bookModel.findOne({ _id: _id });
     if (idAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({ status: false, msg: `ID already deleted!` });
+        .send({ status: false, msg: `ID already deleted!` });
     }
     if (!requestBody.bookId) {
       return res
         .status(400)
-        .json({ status: false, msg: `Book ID is mandatory!` });
+        .send({ status: false, msg: `Book ID is mandatory!` });
     }
     if (!validator.isValidObjectId(bookId)) {
-      return res.status(400).json({ status: false, msg: `Invalid Book ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Book ID!` });
     }
     if (!requestBody.rating) {
       return res
         .status(400)
-        .json({ status: false, msg: `Rating is mandatory field!` });
+        .send({ status: false, msg: `Rating is mandatory field!` });
     }
     if (!validator.isValidRating(rating)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid! Please input valid rating.` });
+        .send({ status: false, msg: `Invalid! Please input valid rating.` });
     }
+    
 
-    if (checkReviewID.bookId.toString() !== req.params.bookId) {
+    if (bookId.toString() !== req.params.bookId) {
       return res
         .status(401)
-        .json({
+        .send({
           status: false,
           msg: `Can't perform this action. Check if Book is correct!`,
         });
@@ -64,13 +65,13 @@ const createReview = async (req, res) => {
     const reviewData = await reviewModel.create(requestBody);
     res
       .status(201)
-      .json({
+      .send({
         status: true,
         msg: `Review created Successfully!`,
         data: reviewData,
       });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -83,65 +84,65 @@ const updateReview = async (req, res) => {
     const { review, rating, reviewedBy } = requestBody;
 
     if (!validator.isValidObjectId(bookId)) {
-      return res.status(400).json({ status: false, msg: `Invalid Book ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Book ID!` });
     }
     const checkID = await bookModel.findById(bookId);
 
     if (!checkID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${bookId} is not present in DB!` });
+        .send({ status: false, msg: `${bookId} is not present in DB!` });
     }
     const idAlreadyDeleted = await bookModel.findOne({ _id: bookId });
     if (idAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({ status: false, msg: `ID already deleted!` });
+        .send({ status: false, msg: `ID already deleted!` });
     }
 
     if (!validator.isValidObjectId(reviewId)) {
-      return res.status(400).json({ status: false, msg: `Invalid Review ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Review ID!` });
     }
     const checkReviewID = await reviewModel.findById(reviewId);
 
     if (!checkReviewID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${reviewId} is not present in DB!` });
+        .send({ status: false, msg: `${reviewId} is not present in DB!` });
     }
     const reviewIdAlreadyDeleted = await reviewModel.findOne({ _id: reviewId });
     if (reviewIdAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({ status: false, msg: `ID already deleted!` });
+        .send({ status: false, msg: `ID already deleted!` });
     }
 
     if (!validator.isValidString(review)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid review format!` });
+        .send({ status: false, msg: `Invalid review format!` });
     }
 
     if (!validator.isValidNumber(rating)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid Rating Format!` });
+        .send({ status: false, msg: `Invalid Rating Format!` });
     }
 
     if (!validator.isValidRating(rating)) {
-      return res.status(400).json({ status: false, msg: `Invalid rating!` });
+      return res.status(400).send({ status: false, msg: `Invalid rating!` });
     }
 
     if (!validator.isValidString(reviewedBy)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Reviewer name is mandatory!` });
+        .send({ status: false, msg: `Reviewer name is mandatory!` });
     }
 
     if (checkReviewID.bookId.toString() !== req.params.bookId) {
       return res
         .status(401)
-        .json({
+        .send({
           status: false,
           msg: `Can't perform this action. Check if Book is correct!`,
         });
@@ -154,13 +155,13 @@ const updateReview = async (req, res) => {
     );
     res
       .status(201)
-      .json({
+      .send({
         status: true,
         msg: `Review Updated Successfully`,
         data: newData,
       });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -169,24 +170,24 @@ const deleteReviewById = async (req, res) => {
     let bookId = req.params.bookId;
     let reviewId = req.params.reviewId;
     if (!validator.isValidObjectId(bookId)) {
-      return res.status(400).json({ status: false, msg: `Invalid Book ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Book ID!` });
     }
     const checkID = await bookModel.findById(bookId);
 
     if (!checkID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${bookId} is not present in DB!` });
+        .send({ status: false, msg: `${bookId} is not present in DB!` });
     }
     const idAlreadyDeleted = await bookModel.findOne({ _id: bookId });
     if (idAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({ status: false, msg: `ID already deleted!` });
+        .send({ status: false, msg: `ID already deleted!` });
     }
 
     if (!validator.isValidObjectId(reviewId)) {
-      return res.status(400).json({ status: false, msg: `Invalid Review ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Review ID!` });
     }
     const checkReviewID = await reviewModel.findById(reviewId);
 
@@ -199,7 +200,7 @@ const deleteReviewById = async (req, res) => {
     if (reviewIdAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({
+        .send({
           status: false,
           msg: `Review with this ID is already deleted!`,
         });
@@ -208,7 +209,7 @@ const deleteReviewById = async (req, res) => {
     if (checkReviewID.bookId.toString() !== req.params.bookId) {
       return res
         .status(401)
-        .json({
+        .send({
           status: false,
           msg: `Can't perform this action. Check if Book is correct!`,
         });
@@ -220,9 +221,9 @@ const deleteReviewById = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ status: true, data: reviewData });
+    res.status(200).send({ status: true, data: reviewData });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 

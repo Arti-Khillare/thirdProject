@@ -8,7 +8,7 @@ const createUser = async (req, res) => {
     if (Object.keys(requestBody).length === 0) {
       return res
         .status(400)
-        .json({
+        .send({
           status: false,
           msg: `Invalid Request. Please input data in the body`,
         });
@@ -19,40 +19,40 @@ const createUser = async (req, res) => {
     if (!requestBody.title) {
       return res
         .status(400)
-        .json({ status: false, msg: `title is mandatory field!` });
+        .send({ status: false, msg: `title is mandatory field!` });
     }
     if (!validator.isValidTitle(title)) {
       return res
         .status(400)
-        .json({ status: false, msg: `title must be Mr, Mrs or Miss!` });
+        .send({ status: false, msg: `title must be Mr, Mrs or Miss!` });
     }
 
     if (!requestBody.name) {
       return res
         .status(400)
-        .json({ status: false, msg: `name is mandatory field!` });
+        .send({ status: false, msg: `name is mandatory field!` });
     }
     if (!validator.isValidString(name)) {
       return res
         .status(400)
-        .json({ status: false, msg: `name is mandatory field!` });
+        .send({ status: false, msg: `name is mandatory field!` });
     }
     if (!requestBody.phone) {
       return res
         .status(400)
-        .json({ status: false, msg: `phone is mandatory field!` });
+        .send({ status: false, msg: `phone is mandatory field!` });
     }
 
     if (!validator.isValidString(phone)) {
       return res
         .status(400)
-        .json({ status: false, msg: `phone is mandatory field!` });
+        .send({ status: false, msg: `phone is mandatory field!` });
     }
 
     if (!/^[6-9]\d{9}$/.test(phone)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid Phone Number!` });
+        .send({ status: false, msg: `Invalid Phone Number!` });
     }
     const isPhoneAlreadyUsed = await userModel.findOne({ phone: phone });
     if (isPhoneAlreadyUsed) {
@@ -64,17 +64,17 @@ const createUser = async (req, res) => {
     if (!requestBody.email) {
       return res
         .status(400)
-        .json({ status: false, msg: `email is mandatory field!` });
+        .send({ status: false, msg: `email is mandatory field!` });
     }
     if (!validator.isValidString(email)) {
       return res
         .status(400)
-        .json({ status: false, msg: `email is mandatory field!` });
+        .send({ status: false, msg: `email is mandatory field!` });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid eMail Address!` });
+        .send({ status: false, msg: `Invalid eMail Address!` });
     }
     const isEmailAlreadyUsed = await userModel.findOne({ email: email });
     //console.log(isEmailAlreadyUsed)
@@ -87,40 +87,40 @@ const createUser = async (req, res) => {
     if (!requestBody.password) {
       return res
         .status(400)
-        .json({ status: false, msg: `password is mandatory field!` });
+        .send({ status: false, msg: `password is mandatory field!` });
     }
     if (!validator.isValidString(password)) {
       return res
         .status(400)
-        .json({ status: false, msg: `password is mandatory field!` });
+        .send({ status: false, msg: `password is mandatory field!` });
     }
     if (validator.isValidPassword(password)) {
       return res
         .status(400)
-        .json({ status: false, msg: `password must be 8-15 characters long!` });
+        .send({ status: false, msg: `password must be 8-15 characters long!` });
     }
 
     if (!requestBody.address) {
       return res
         .status(400)
-        .json({ status: false, msg: `address is mandatory field!` });
+        .send({ status: false, msg: `address is mandatory field!` });
     }
     if (!validator.isValidString(address)) {
       return res
         .status(400)
-        .json({ status: false, msg: `address is mandatory field!` });
+        .send({ status: false, msg: `address is mandatory field!` });
     }
 
     const users = await userModel.create(requestBody);
     return res
       .status(201)
-      .json({
+      .send({
         status: true,
         msg: `User registered successfully!`,
         data: users,
       });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -130,7 +130,7 @@ const userLogin = async (req, res) => {
     if (Object.keys(requestBody).length === 0) {
       return res
         .status(400)
-        .json({
+        .send({
           status: false,
           msg: `Invalid input. Please enter email and password!`,
         });
@@ -140,27 +140,27 @@ const userLogin = async (req, res) => {
     if (!requestBody.email) {
       return res
         .status(400)
-        .json({ status: false, msg: `email is mandatory field!` });
+        .send({ status: false, msg: `email is mandatory field!` });
     }
     if (!validator.isValidString(email)) {
       return res
         .status(400)
-        .json({ status: false, msg: `email is mandatory field!` });
+        .send({ status: false, msg: `email is mandatory field!` });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid eMail Address!` });
+        .send({ status: false, msg: `Invalid eMail Address!` });
     }
     if (!requestBody.password) {
       return res
         .status(400)
-        .json({ status: false, msg: `password is mandatory field!` });
+        .send({ status: false, msg: `password is mandatory field!` });
     }
     if (!validator.isValidString(password)) {
       return res
         .status(400)
-        .json({ status: false, msg: `password is mandatory field!` });
+        .send({ status: false, msg: `password is mandatory field!` });
     }
 
     const findUser = await userModel.findOne({
@@ -170,12 +170,14 @@ const userLogin = async (req, res) => {
     if (!findUser) {
       return res
         .status(401)
-        .json({ status: false, msg: `Invalid email or password!` });
+        .send({ status: false, msg: `Invalid email or password!` });
     }
 
     const token = jwt.sign(
       {
         userId: findUser._id,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60
       },
       "thorium@group23"
     );
@@ -183,9 +185,9 @@ const userLogin = async (req, res) => {
     res.setHeader("x-api-key", token);
     res
       .status(201)
-      .json({ status: true, msg: `user login successful`, data: token });
+      .send({ status: true, msg: `user login successful`, data: token });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 

@@ -12,7 +12,7 @@ const createBook = async (req, res) => {
     if (Object.keys(requestBody).length === 0) {
       return res
         .status(400)
-        .json({
+        .send({
           status: false,
           msg: `Invalid Request. Please input data in the body`,
         });
@@ -24,12 +24,12 @@ const createBook = async (req, res) => {
     if (!requestBody.title) {
       return res
         .status(400)
-        .json({ status: false, msg: `title is mandatory field!` });
+        .send({ status: false, msg: `title is mandatory field!` });
     }
     if (!validator.isValidString(title)) {
       return res
         .status(400)
-        .json({ status: false, msg: `title must be present!` });
+        .send({ status: false, msg: `title must be present!` });
     }
     const isTitleAlreadyUsed = await bookModel.findOne({ title: title });
     if (isTitleAlreadyUsed) {
@@ -40,52 +40,52 @@ const createBook = async (req, res) => {
     if (!requestBody.excerpt) {
       return res
         .status(400)
-        .json({ status: false, msg: `excerpt is mandatory field!` });
+        .send({ status: false, msg: `excerpt is mandatory field!` });
     }
 
     if (!validator.isValidString(excerpt)) {
       return res
         .status(400)
-        .json({ status: false, msg: `excerpt is mandatory field!` });
+        .send({ status: false, msg: `excerpt is mandatory field!` });
     }
     if (!requestBody.userId) {
       return res
         .status(400)
-        .json({ status: false, msg: `userID is mandatory field!` });
+        .send({ status: false, msg: `userID is mandatory field!` });
     }
 
     if (!validator.isValidObjectId(userId)) {
       return res
         .status(400)
-        .json({ status: false, msg: `userID is mandatory field!` });
+        .send({ status: false, msg: `userID is mandatory field!` });
     }
 
     if (!validator.isValidObjectId(userId)) {
       return res
         .status(400)
-        .json({ status: false, msg: `${userId} is not valid User ID!` });
+        .send({ status: false, msg: `${userId} is not valid User ID!` });
     }
     const findUser = await userModel.findById(userId);
     if (!findUser) {
       return res
         .status(404)
-        .json({ status: false, msg: `${userId} is not present in DB!` });
+        .send({ status: false, msg: `${userId} is not present in DB!` });
     }
 
     if (!requestBody.ISBN) {
       return res
         .status(400)
-        .json({ status: false, msg: `ISBN is mandatory field!` });
+        .send({ status: false, msg: `ISBN is mandatory field!` });
     }
     if (!validator.isValidString(ISBN)) {
       return res
         .status(400)
-        .json({ status: false, msg: `ISBN is mandatory field!` });
+        .send({ status: false, msg: `ISBN is mandatory field!` });
     }
     if (!validator.isValidISBN(ISBN)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Provide valid 13-digit ISBN!` });
+        .send({ status: false, msg: `Provide valid 13-digit ISBN!` });
     }
     const isISBNAlreadyUsed = await bookModel.findOne({ ISBN: ISBN });
     if (isISBNAlreadyUsed) {
@@ -97,44 +97,44 @@ const createBook = async (req, res) => {
     if (!requestBody.category) {
       return res
         .status(400)
-        .json({ status: false, msg: `category is mandatory field!` });
+        .send({ status: false, msg: `category is mandatory field!` });
     }
     if (!validator.isValidString(category)) {
       return res
         .status(400)
-        .json({ status: false, msg: `category is mandatory field!` });
+        .send({ status: false, msg: `category is mandatory field!` });
     }
     if (!requestBody.subcategory) {
       return res
         .status(400)
-        .json({ status: false, msg: `subcategory is mandatory field!` });
+        .send({ status: false, msg: `subcategory is mandatory field!` });
     }
     if (!validator.isValidString(subcategory)) {
       return res
         .status(400)
-        .json({ status: false, msg: `subcategory is mandatory field!` });
+        .send({ status: false, msg: `subcategory is mandatory field!` });
     }
     if (!requestBody.releasedAt) {
       return res
         .status(400)
-        .json({ status: false, msg: `Release Date is missing!` });
+        .send({ status: false, msg: `Release Date is missing!` });
     }
     if (!validator.isValidString(releasedAt)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Release Date is mandatory field!` });
+        .send({ status: false, msg: `Release Date is mandatory field!` });
     }
 
     if (!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid Date format!` });
+        .send({ status: false, msg: `Invalid Date format!` });
     }
 
     const books = await bookModel.create(requestBody);
     return res
       .status(201)
-      .json({ status: true, msg: `Book created successfully!`, data: books });
+      .send({ status: true, msg: `Book created successfully!`, data: books });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
@@ -159,12 +159,12 @@ const getBooks = async (req, res) => {
     if (!(books.length > 0)) {
       return res
         .status(404)
-        .json({ status: false, msg: `No Book found with matching filters!` });
+        .send({ status: false, msg: `No Book found with matching filters!` });
     }
     const sortedBooks = books.sort((a, b) => a.title.localeCompare(b.title));
-    res.status(200).json({ status: true, data: sortedBooks });
+    res.status(200).send({ status: true, data: sortedBooks });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -173,14 +173,14 @@ const getBooksById = async (req, res) => {
   try {
     let { bookId: _id } = req.params;
     if (!validator.isValidObjectId(_id)) {
-      return res.status(400).json({ status: false, msg: `Invalid ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid ID!` });
     }
     const bookData = await bookModel.findById(_id);
 
     if (!bookData) {
       return res
         .status(404)
-        .json({ status: false, msg: `${_id} is not present in DB!` });
+        .send({ status: false, msg: `${_id} is not present in DB!` });
     }
 
     const bookId = bookData._id;
@@ -193,9 +193,9 @@ const getBooksById = async (req, res) => {
 
     let finalData = { bookData, reviewsData };
     bookData.reviews = countOfReviews;
-    res.status(200).json({ status: true, data: finalData });
+    res.status(200).send({ status: true, data: finalData });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -206,7 +206,7 @@ const updateBookById = async (req, res) => {
     const { ISBN, title, releasedAt } = requestBody;
 
     if (!validator.isValidObjectId(_id)) {
-      return res.status(400).json({ status: false, msg: `Invalid Book ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Book ID!` });
     }
 
     const checkID = await bookModel.findById(_id);
@@ -214,7 +214,7 @@ const updateBookById = async (req, res) => {
     if (!checkID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${_id} is not present in DB!` });
+        .send({ status: false, msg: `${_id} is not present in DB!` });
     }
     const isISBNAlreadyUsed = await bookModel.findOne({ ISBN: ISBN });
     if (isISBNAlreadyUsed) {
@@ -225,38 +225,38 @@ const updateBookById = async (req, res) => {
     if (!validator.isValidISBN(ISBN)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Provide valid 13-digit ISBN!` });
+        .send({ status: false, msg: `Provide valid 13-digit ISBN!` });
     }
     if (!title) {
       return res
         .status(400)
-        .json({ status: false, msg: `Give a valid title for updation!` });
+        .send({ status: false, msg: `Give a valid title for updation!` });
     }
     if (!validator.isValidString(title)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Please provide a valid title!` });
+        .send({ status: false, msg: `Please provide a valid title!` });
     }
     if (!requestBody.releasedAt) {
       return res
         .status(400)
-        .json({ status: false, msg: `Release Date is missing!` });
+        .send({ status: false, msg: `Release Date is missing!` });
     }
     if (!validator.isValidString(releasedAt)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Release Date is mandatory field!` });
+        .send({ status: false, msg: `Release Date is mandatory field!` });
     }
 
     if (!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) {
       return res
         .status(400)
-        .json({ status: false, msg: `Invalid Date format!` });
+        .send({ status: false, msg: `Invalid Date format!` });
     }
     if (!requestBody.title) {
       return res
         .status(400)
-        .json({ status: false, msg: `title is a mandatory field!` });
+        .send({ status: false, msg: `title is a mandatory field!` });
     }
     const isTitleAlreadyUsed = await bookModel.findOne({ title: title });
     if (isTitleAlreadyUsed) {
@@ -271,21 +271,21 @@ const updateBookById = async (req, res) => {
     if (idAlreadyDeleted.isDeleted === true) {
       return res
         .status(404)
-        .json({ status: false, msg: `Book Not Found or Deleted!` });
+        .send({ status: false, msg: `Book Not Found or Deleted!` });
     }
 
     let userId = req.query.userId;
     if (!userId) {
       return res
         .status(400)
-        .json({ status: false, msg: `User ID Query not present!` });
+        .send({ status: false, msg: `User ID Query not present!` });
     }
 
     if (checkID.userId.toString() !== req.query.userId) {
       //console.log(checkID.userId.toString(), req.query.userId );
       return res
         .status(401)
-        .json({
+        .send({
           status: false,
           msg: `User not authorised to delete this book!`,
         });
@@ -296,9 +296,9 @@ const updateBookById = async (req, res) => {
     });
     res
       .status(201)
-      .json({ status: true, msg: `Updated Successfully`, data: newData });
+      .send({ status: true, msg: `Updated Successfully`, data: newData });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
@@ -306,21 +306,21 @@ const deleteById = async (req, res) => {
   try {
     let { bookId: _id } = req.params;
     if (!validator.isValidObjectId(_id)) {
-      return res.status(400).json({ status: false, msg: `Invalid Book ID!` });
+      return res.status(400).send({ status: false, msg: `Invalid Book ID!` });
     }
     const checkID = await bookModel.findById(_id);
 
     if (!checkID) {
       return res
         .status(404)
-        .json({ status: false, msg: `${_id} is not present in DB!` });
+        .send({ status: false, msg: `${_id} is not present in DB!` });
     }
 
     const idAlreadyDeleted = await bookModel.findOne({ _id: _id });
     if (idAlreadyDeleted.isDeleted === true) {
       return res
         .status(400)
-        .json({ status: false, msg: `Book already deleted!` });
+        .send({ status: false, msg: `Book already deleted!` });
     }
 
     //expecting userId in Query Params
@@ -328,14 +328,14 @@ const deleteById = async (req, res) => {
     if (!userId) {
       return res
         .status(400)
-        .json({ status: false, msg: `User ID Query not present!` });
+        .send({ status: false, msg: `User ID Query not present!` });
     }
     //Authorisation- Checking if the owner of book is the one making changes etc.
     if (checkID.userId.toString() !== req.query.userId) {
       console.log(checkID.userId.toString(), req.query.userId);
       return res
         .status(401)
-        .json({
+        .send({
           status: false,
           msg: `User not authorised to delete this book!`,
         });
@@ -347,9 +347,9 @@ const deleteById = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ status: true, data: bookData });
+    res.status(200).send({ status: true, data: bookData });
   } catch (error) {
-    res.status(500).json({ status: false, error: error.message });
+    res.status(500).send({ status: false, error: error.message });
   }
 };
 
