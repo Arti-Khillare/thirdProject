@@ -25,8 +25,7 @@ const bookSchema = new mongoose.Schema(
       trim: true,
       match: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
     },
-  },
-  { timestamps: true }
+  }, { timestamps: true }
 );
 
 module.exports = mongoose.model("Books", bookSchema);
