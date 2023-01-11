@@ -8,7 +8,7 @@ app.use("/", route);
 
 try {
   //insert your MONGO ATLAS string here :-
-  mongoose.connect("mongodb+srv://AartiZare:aartizare@cluster0.l0uzu.mongodb.net/group23-DB?retryWrites=true&w=majority", {
+  mongoose.connect("mongodb+srv://ArtiKhillare:jR067NcnClM96Fp1@cluster0.wi9j2.mongodb.net/Project3-Db?retryWrites=true&w=majority", {
     useNewUrlParser: true,
   });
   console.log(`MongoDB connection successful`);
